@@ -1,0 +1,34 @@
+#!/usr/bin/env dash
+
+# term-dmenu is a dmenu/rofi-dmenu replacement that launches a terminal
+# emulator to filter stdin using fzf. Arguments are passed to fzf.
+# Requires a POSIX-compliant shell, fzf, and abduco.
+
+export FZF_DEFAULT_OPTS="$* $FZF_DEFAULT_OPTS"
+
+# This happens in three steps:
+
+# 1. if a named pipe for term-dmenu doesn't exist, create it
+[ -p /tmp/term-dmenu ] || mkfifo /tmp/term-dmenu &
+
+# 2. export stdin, separated by newlines, so the terminal process can
+#    access it
+IFS=$(printf '\n')
+input=$(cat)
+export input
+
+# 3. open a floating terminal with supressed stderr, running a shell
+#    command that does the following:.
+# 	3a. filter $input in fzf
+# 	3b. send the result to the named pipe in a detached abduco session
+# I chose to do do step 3b in a detached abduco session because the
+# session needs to stay alive after the terminal closes
+# shellcheck disable=SC2016 # I don't want expressions to expand
+floating-terminal dash -c \
+	'output=$(echo "$input" | fzf); export output; abduco -rnf term-dmenu dash -c "echo \"$output\" >/tmp/term-dmenu" 2>/dev/null' 2>/dev/null
+
+# 4. send the value from the named pipe to stdout
+cat </tmp/term-dmenu
+
+# vi:ft=sh
+

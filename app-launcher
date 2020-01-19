@@ -1,0 +1,6 @@
+#!/usr/bin/env dash
+
+# launcher for .desktop files; used with app-runner script
+SHELL=$(command -v dash) j4-dmenu-desktop --term="$TERMINAL" --dmenu="term-dmenu"
+
+# vi:ft=sh

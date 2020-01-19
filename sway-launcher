@@ -1,0 +1,68 @@
+#!/usr/bin/env dash
+
+# POSIX-compliant shell script to replace dmenu/rofi's command-running
+# functionality. Based on:
+# https://gitlab.com/FlyingWombat/my-scripts/blob/a0cb5717777c1587af381004aa8fb048206bee55/sway-launcher
+
+# Pick your preferred dmenu-like program. It should not do any sorting.
+dmenu_program='term-dmenu --no-extended --print-query --no-sort'
+
+HIST_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/sway-launcher-history.txt"
+
+# Get shell command list
+
+# This may include the occasional non-executable file
+
+# shellcheck disable=SC2046 # word-splitting isn't an issue here.
+command_list=$(stest -flx $(echo "$PATH" | tr : ' ' | sort -u))
+
+# read existing command history
+
+if [ -f "$HIST_FILE" ]; then
+	command_history=$(cat "$HIST_FILE")
+else
+	command_history=""
+fi
+
+# search command list
+
+command_str=$(printf "%s\n" "${command_history}" "${command_list}" \
+	| sed -E 's/^[0-9]+ (.+)$/\1/' \
+	| $dmenu_program \
+	| tail -n1) || exit 1
+
+if [ "$command_str" = "" ]; then
+	exit 1
+fi
+
+# using \E flag from perl regex
+test "${command_str#*\\E}" != "$command_str" && echo "command can't contain '\E'"
+test "${command_str#*\\E}" != "$command_str" && exit 1
+
+update_history() {
+	# get full line from history (with count number)
+	hist_line=$(echo "$command_history" | grep -Pe "^[0-9]+ \Q$command_str\E$")
+
+	if [ "$hist_line" = "" ]; then
+		hist_count=1
+	else
+		# Increment usage count
+		hist_count=$(echo "$hist_line" | sed -E 's/^([0-9]+) .+$/\1/')
+		hist_count=$((hist_count + 1))
+		# delete line, to add updated later
+		command_history=$(echo "$command_history" \
+			| grep --invert-match -Pe "^[0-9]+ \Q$command_str\E$")
+	fi
+
+	# update history
+	update_line="${hist_count} ${command_str}"
+	printf "%s\n" "${update_line}" "${command_history}" \
+		| sort --numeric-sort --reverse >"$HIST_FILE"
+}
+update_history &
+
+# execute command
+swaymsg -t command exec "$command_str" &
+
+# vi:ft=sh
+

@@ -1,0 +1,18 @@
+#!/usr/bin/env dash
+
+# Window-switcher for SwayWM, similar to switchers typically launched with alt-tab
+# based on
+# https://framagit.org/roipoussiere/dotfiles/blob/6618e7a39c5d43b4b3e776afd4ee0a5c999c294a/home/.config/sway/config#L165
+# and https://www.reddit.com/comments/aolf3u/_/eg6twfh
+
+dmenu_program=term-dmenu
+
+swaymsg -t get_tree \
+	| jq -r 'recurse(.nodes[]?)|recurse(.floating_nodes[]?)|select(.type=="con"),select(.type=="floating_con")|(.id|tostring)+" "+.app_id+": "+.name' \
+	| grep -v '^[0-9]* \: $' \
+	| $dmenu_program \
+	| awk '{print $1}' \
+	| xargs -I % swaymsg '[con_id="%"] focus'
+
+# vi:ft=sh
+

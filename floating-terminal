@@ -1,0 +1,14 @@
+#!/usr/bin/env dash
+
+# This is the terminal program that term-dmenu runs. Some examples:
+# alacritty --class launcher -e "$@"
+# kitty --class launcher "$@"
+# These examples give the window the "launcher" class so you can make your window
+# manager float anything with class "launcher"
+
+# I use havoc (https://github.com/ii8/havoc) for my launchers because it starts up
+# super quickly and is Wayland-native.
+havoc "$@"
+
+# vi:ft=sh
+
