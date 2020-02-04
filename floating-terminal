@@ -8,7 +8,19 @@
 
 # I use havoc (https://github.com/ii8/havoc) for my launchers because it starts up
 # super quickly and is Wayland-native.
-havoc "$@"
+
+if [ -z "$FLOATING_TERMINAL" ]; then
+	find_alt() {
+		for i; do
+			command -v "${i%% *}" >/dev/null && {
+				echo "$i"
+				return 0
+			}
+		done
+		return 1
+	}
+	FLOATING_TERMINAL=$(find_alt havoc 'alacritty --class=launcher -e' 'kitty --class=launcher -e' 'konsole -e' 'gnome-terminal -e' 'termite -e' 'st -c launcher -e' 'xterm -e')
+fi
+$FLOATING_TERMINAL "$@"
 
 # vi:ft=sh
-
