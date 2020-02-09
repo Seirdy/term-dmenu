@@ -1,4 +1,4 @@
-#!/usr/bin/env dash
+#!/bin/sh
 
 # This is the terminal program that term-dmenu runs. Some examples:
 # alacritty --class launcher -e "$@"
@@ -10,6 +10,7 @@
 # super quickly and is Wayland-native.
 
 if [ -z "$FLOATING_TERMINAL" ]; then
+	# find_alt() prints the first parameter recognized by `command -v`
 	find_alt() {
 		for i; do
 			command -v "${i%% *}" >/dev/null && {
@@ -21,6 +22,7 @@ if [ -z "$FLOATING_TERMINAL" ]; then
 	}
 	FLOATING_TERMINAL=$(find_alt havoc 'alacritty --class=launcher -e' 'kitty --class=launcher -e' 'konsole -e' 'gnome-terminal -e' 'termite -e' 'st -c launcher -e' 'xterm -e')
 fi
+
 $FLOATING_TERMINAL "$@"
 
 # vi:ft=sh

@@ -1,18 +1,26 @@
-#!/usr/bin/env dash
+#!/bin/sh
 
 # Window-switcher for SwayWM, similar to switchers typically launched with alt-tab
 # based on
 # https://framagit.org/roipoussiere/dotfiles/blob/6618e7a39c5d43b4b3e776afd4ee0a5c999c294a/home/.config/sway/config#L165
 # and https://www.reddit.com/comments/aolf3u/_/eg6twfh
 
-dmenu_program=term-dmenu
+# set your preferred dmenu-like program in the environment variable $DMENU_PROGRAM
+# examples: "dmenu", "rofi -dmenu", "term-dmenu", or just "fzf" to run in your current terminal
+[ -z "$DMENU_PROGRAM" ] && DMENU_PROGRAM='term-dmenu --no-extended --print-query --no-sort'
 
-swaymsg -t get_tree \
+if [ -n "$SWAYSOCK" ] && command -v swaymsg >/dev/null; then
+	msgprogram='swaymsg'
+elif [ -n "$I3SOCK" ] && command -v i3msg >/dev/null; then
+	msgprogram='i3msg'
+fi
+
+$msgprogram -t get_tree \
 	| jq -r 'recurse(.nodes[]?)|recurse(.floating_nodes[]?)|select(.type=="con"),select(.type=="floating_con")|(.id|tostring)+" "+.app_id+": "+.name' \
 	| grep -v '^[0-9]* \: $' \
-	| $dmenu_program \
+	| $DMENU_PROGRAM \
 	| awk '{print $1}' \
-	| xargs -I % swaymsg '[con_id="%"] focus'
+	| xargs -I % $msgprogram '[con_id="%"] focus'
 
 # vi:ft=sh
 

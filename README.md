@@ -20,15 +20,15 @@ What's inside
   of executables on most systems, recent entries are saved and prioritized to make
   searching easier.
 - `app-launcher` launches desktop applications using `j4-dmenu-desktop`
-- `window-switcher` allows listing/filtering/selecting open windows in Sway (much
-  like what Alt+TAB does on most desktop environments).
+- `window-switcher` allows listing/filtering/selecting open windows in Sway or i3
+  (much like what Alt+TAB does on most desktop environments).
 
 Dependencies
 ------------
 
 - FZF
 - `j4-dmenu-desktop` for `app-launcher`
-- `window-switcher` requires Sway to be running
+- `window-switcher` requires Sway or i3 to be running
 
 Differences from similar implementations
 ----------------------------------------
@@ -50,7 +50,7 @@ Differences from similar implementations
 Acknowledgements
 ----------------
 
-`sway-launcher` code is based on [this
+`dmenu-runner` code is based on [this
 script](https://gitlab.com/FlyingWombat/my-scripts/blob/a0cb5717777c1587af381004aa8fb048206bee55/sway-launcher)
 by FlyingWombat ([Wayback
 Machine](https://web.archive.org/web/20200209122744/https://gitlab.com/FlyingWombat/my-scripts/blob/a0cb5717777c1587af381004aa8fb048206bee55/sway-launcher),

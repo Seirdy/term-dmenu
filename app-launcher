@@ -1,6 +1,10 @@
-#!/usr/bin/env dash
+#!/bin/sh
+
+# set your preferred dmenu-like program in the environment variable $DMENU_PROGRAM
+# examples: "dmenu", "rofi -dmenu", "term-dmenu", or just "fzf" to run in your current terminal
+[ -z "$DMENU_PROGRAM" ] && DMENU_PROGRAM='term-dmenu --no-extended --print-query'
 
 # launcher for .desktop files; used with app-runner script
-SHELL=$(command -v dash) j4-dmenu-desktop --term="$TERMINAL" --dmenu="term-dmenu"
+j4-dmenu-desktop --term="$TERMINAL" --dmenu="$DMENU_PROGRAM"
 
 # vi:ft=sh
