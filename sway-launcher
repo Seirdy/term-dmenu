@@ -1,13 +1,24 @@
-#!/usr/bin/env dash
+#!/bin/sh
 
-# POSIX-compliant shell script to replace dmenu/rofi's command-running
-# functionality. Based on:
+# POSIX-compliant (bashism-free) shell script to use a dmenu-like program
+# to select/run executables found in $PATH, saving and prioritizing previous
+# commands. An alternative to the "dmenu_run" command shipped with dmenu and the
+# dmenu_run_history script available from the suckless website:
+# https://tools.suckless.org/dmenu/scripts/dmenu_run_with_command_history/
+
+# Based on:
 # https://gitlab.com/FlyingWombat/my-scripts/blob/a0cb5717777c1587af381004aa8fb048206bee55/sway-launcher
 
-# Pick your preferred dmenu-like program. It should not do any sorting.
-dmenu_program='term-dmenu --no-extended --print-query --no-sort'
+# configuration
 
-HIST_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/sway-launcher-history.txt"
+# set your preferred dmenu-like program in the environment variable $DMENU_PROGRAM
+# examples: "dmenu", "rofi -dmenu", "term-dmenu", or just "fzf" to run in your current terminal
+[ -z "$DMENU_PROGRAM" ] && DMENU_PROGRAM='term-dmenu --no-extended --print-query --no-sort'
+if [ -z "$RUNNER_HISTFILE" ]; then
+	cachedir=${XDG_CACHE_HOME:-"$HOME/.cache"}
+	mkdir -p "$cachedir"
+	RUNNER_HISTFILE="$cachedir/dmenu_runner_history"
+fi
 
 # Get shell command list
 
@@ -18,8 +29,8 @@ command_list=$(stest -flx $(echo "$PATH" | tr : ' ' | sort -u))
 
 # read existing command history
 
-if [ -f "$HIST_FILE" ]; then
-	command_history=$(cat "$HIST_FILE")
+if [ -f "$RUNNER_HISTFILE" ]; then
+	command_history=$(cat "$RUNNER_HISTFILE")
 else
 	command_history=""
 fi
@@ -28,7 +39,7 @@ fi
 
 command_str=$(printf "%s\n" "${command_history}" "${command_list}" \
 	| sed -E 's/^[0-9]+ (.+)$/\1/' \
-	| $dmenu_program \
+	| $DMENU_PROGRAM \
 	| tail -n1) || exit 1
 
 if [ "$command_str" = "" ]; then
@@ -57,12 +68,20 @@ update_history() {
 	# update history
 	update_line="${hist_count} ${command_str}"
 	printf "%s\n" "${update_line}" "${command_history}" \
-		| sort --numeric-sort --reverse >"$HIST_FILE"
+		| sort --numeric-sort --reverse >"$RUNNER_HISTFILE"
 }
 update_history &
 
 # execute command
-swaymsg -t command exec "$command_str" &
+if [ -n "$SWAYSOCK" ]; then
+	swaymsg -t command exec "$command_str" &
+else
+	eval "$command_str" &
+	# "disown" is a bashism; use it if only if the shell supports job control
+	if command -v disown >/dev/null; then
+		# shellcheck disable=SC2039
+		disown
+	fi
+fi
 
 # vi:ft=sh
-
