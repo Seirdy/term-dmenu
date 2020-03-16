@@ -8,6 +8,10 @@ export FZF_DEFAULT_OPTS="$* $FZF_DEFAULT_OPTS"
 
 # This happens in three steps:
 
+cleanup() {
+	rm -f /tmp/term-dmenu
+}
+trap cleanup EXIT
 # 1. if a named pipe for term-dmenu doesn't exist, create it
 [ -p /tmp/term-dmenu ] || mkfifo /tmp/term-dmenu &
 
