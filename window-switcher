@@ -9,6 +9,7 @@
 # examples: "dmenu", "rofi -dmenu", "term-dmenu", or just "fzf" to run in your current terminal
 [ -z "$DMENU_PROGRAM" ] && DMENU_PROGRAM='term-dmenu --no-extended --print-query --no-sort'
 
+# shellcheck disable=SC2154
 if [ -n "$SWAYSOCK" ] && command -v swaymsg >/dev/null; then
 	msgprogram='swaymsg'
 elif [ -n "$I3SOCK" ] && command -v i3msg >/dev/null; then
@@ -23,4 +24,3 @@ $msgprogram -t get_tree \
 	| xargs -I % $msgprogram '[con_id="%"] focus'
 
 # vi:ft=sh
-

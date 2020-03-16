@@ -5,6 +5,11 @@
 [ -z "$DMENU_PROGRAM" ] && DMENU_PROGRAM='term-dmenu --no-extended --print-query'
 
 # launcher for .desktop files; used with app-runner script
-j4-dmenu-desktop --term="$TERMINAL" --dmenu="$DMENU_PROGRAM"
+# shellcheck disable=SC2154
+if [ -n "$TERMINAL" ]; then
+	j4-dmenu-desktop --term="$TERMINAL" --dmenu="$DMENU_PROGRAM"
+else
+	j4-dmenu-desktop --dmenu="$DMENU_PROGRAM"
+fi
 
 # vi:ft=sh
