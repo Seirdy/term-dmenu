@@ -21,6 +21,6 @@ $msgprogram -t get_tree \
 	| grep -v '^[0-9]* \: $' \
 	| $DMENU_PROGRAM \
 	| awk '{print $1}' \
-	| xargs -I % $msgprogram '[con_id="%"] focus'
+	| xargs -I % "$msgprogram" '[con_id="%"] focus'
 
 # vi:ft=sh
