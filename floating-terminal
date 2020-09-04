@@ -20,7 +20,7 @@ if [ -z "$FLOATING_TERMINAL" ]; then
 		done
 		return 1
 	}
-	FLOATING_TERMINAL=$(find_alt havoc 'alacritty --class=launcher -e' 'kitty --class=launcher -e' 'konsole -e' 'gnome-terminal -e' 'termite -e' 'st -c launcher -e' 'xterm -e')
+	FLOATING_TERMINAL=$(find_alt foot havoc 'alacritty --class=launcher -e' 'kitty --class=launcher -e' 'konsole -e' 'gnome-terminal -e' 'termite -e' 'st -c launcher -e' 'xterm -e')
 fi
 
 $FLOATING_TERMINAL "$@"
