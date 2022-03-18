@@ -25,7 +25,7 @@ fi
 # This may include the occasional non-executable file
 
 # shellcheck disable=SC2046 # word-splitting isn't an issue here.
-command_list=$(stest -flx $(echo "$PATH" | tr : ' ' | sort -u))
+command_list=$(stest -flx $(echo "$PATH" | tr : '\n' | sort -u) | sort -u)
 
 # read existing command history
 
